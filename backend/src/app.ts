@@ -3,9 +3,6 @@ import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 dotenv.config();
 
-// import routes
-import authRoutes from './routes/authRoutes';
-
 const app = express();
 
 // Database Connection
@@ -39,11 +36,12 @@ AppDataSource.initialize()
 app.use(express.json());
 
 // Routes
+import authRoutes from './routes/authRoutes';
+app.use('/auth', authRoutes);
 app.get('/', (req: Request, res: Response) => {
   res.send('Welcome to the To-Do List API!');
 });
 
-app.use('/auth', authRoutes);
 
 const PORT = 3000;
 app.listen(PORT, () => {
