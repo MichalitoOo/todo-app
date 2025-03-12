@@ -1,9 +1,11 @@
 import 'reflect-metadata';
+import morgan from 'morgan';
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
+app.use(morgan('dev')); // logs every request to the console (method, status, response time)
 
 // Database Connection
 
@@ -14,7 +16,7 @@ export const AppDataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
   synchronize: true,
-  logging: false,
+  logging: true, // Set to false in production
   entities: ["src/models/**/*.ts"],
   migrations: ["src/migrations/**/*.ts"],
   subscribers: [],
