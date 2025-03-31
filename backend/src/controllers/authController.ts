@@ -60,5 +60,11 @@ export const login: RequestHandler = async (req: Request, res: Response) => {
     res.json({ token });
   } catch (error) {
     res.status(500).json({ error: 'Error logging in.' });
+    return
   }
+};
+
+export const home: RequestHandler = async (req: Request, res: Response) => {
+  res.status(200).json({ message: 'Welcome to the protected home page!', user: req.body.userId });
+  return;
 };
