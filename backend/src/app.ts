@@ -21,9 +21,7 @@ export const AppDataSource = new DataSource({
   migrations: ["src/migrations/**/*.ts"],
   subscribers: [],
   extra: {
-    ssl: {
-      rejectUnauthorized: false,
-    },
+    ssl: false, // Set to true if using SSL in production
   },
 });
 
