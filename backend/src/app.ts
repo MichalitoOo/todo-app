@@ -3,6 +3,7 @@ import morgan from 'morgan';
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 dotenv.config();
+import errorHandler from './middlewares/errorHandler';
 
 const app = express();
 app.use(morgan('dev')); // logs every request to the console (method, status, response time)
@@ -37,10 +38,13 @@ app.use(express.json());
 
 // Routes
 import authRoutes from './routes/authRoutes';
+import { error } from 'console';
 app.use('/auth', authRoutes);
 app.get('/', (req: Request, res: Response) => {
   res.send('Welcome to the To-Do List API!');
 });
+
+app.use(errorHandler);
 
 
 const PORT = 3000;
