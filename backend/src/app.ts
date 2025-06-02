@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import errorHandler from './middlewares/errorHandler';
 
+
 const app = express();
 app.use(morgan('dev')); // logs every request to the console (method, status, response time)
 
@@ -38,12 +39,12 @@ app.use(express.json());
 
 // Routes
 import authRoutes from './routes/authRoutes';
-import { error } from 'console';
-app.use('/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 app.get('/', (req: Request, res: Response) => {
   res.send('Welcome to the To-Do List API!');
 });
 
+// Error Handling Middleware
 app.use(errorHandler);
 
 

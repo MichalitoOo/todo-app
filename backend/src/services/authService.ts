@@ -1,7 +1,8 @@
 import { User } from '../models/User';
 import { AppDataSource } from '../app'; // Adjust based on your setup
 import bcrypt from 'bcrypt';
-import { AppError } from '../utils/AppError';
+import AppError from '../utils/AppError';
+
 
 
 export const registerUser = async (email: string, password: string) => {
