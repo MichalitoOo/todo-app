@@ -2,6 +2,7 @@ import { User } from '../models/User';
 import { AppDataSource } from '../app'; // Adjust based on your setup
 import bcrypt from 'bcrypt';
 import AppError from '../utils/AppError';
+import { sign } from 'jsonwebtoken';
 
 
 
@@ -33,3 +34,35 @@ export const registerUser = async (email: string, password: string) => {
         email: createdUser.email
     };
 };
+
+
+export const loginUser = async (email: string, password: string) => {
+    console.log("Starting user login...");
+
+    // Validate the user exists
+    console.log("Checking if user exists...");
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository.findOneBy({ email });
+    if (!user) {
+        console.log("No user found with this email:", email);
+        throw new AppError(400, "User with the email address was not found.");
+    }
+
+    console.log("Validating password...");
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+        console.log("Invalid password for user:", email);
+        throw new AppError(401, "Invalid email or password.");
+    }
+
+    const userInfo = {
+    id: user.id,
+    email: user.email
+    };
+
+    console.log("User logged in successfully.. returning JWT token and user info.");
+    const token = sign({ user: userInfo }, process.env.JWT_SECRET as string, {
+        expiresIn: '1h' // Adjust the expiration time as needed
+    });
+    return { token };
+}

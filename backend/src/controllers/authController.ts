@@ -1,5 +1,5 @@
 import { Request, RequestHandler, Response } from 'express';
-import { registerUser } from '../services/authService';
+import { registerUser, loginUser } from '../services/authService';
 import AppError from '../utils/AppError';
 // import jwt from 'jsonwebtoken';
 
@@ -41,34 +41,38 @@ export const register: RequestHandler = async (req: Request, res: Response, next
   }
 };
 
+export const login: RequestHandler = async (req: Request, res: Response, next) => {
+  console.log("Incoming request to /login", req.body); // Log request body
+  const { email, password } = req.body;
+  if (!email || !password) {
+    console.log("Missing email or password.");
+    throw new AppError(400, "Email and password are required.");
+  }
 
-// export const login: RequestHandler = async (req: Request, res: Response) => {
-//   const { email, password } = req.body;
+  console.log("Validating email format and length...");
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    console.log("Invalid email format.");
+    throw new AppError(400, "Invalid email format.");
+  }
 
-//   try {
-//     const user = await userRepository.findOneBy({ email }); // TypeORM
-//     if (!user){
-//       res.status(404).json({ error: 'User not found.' });
-//       return;
-//     } 
+  if (email.length > 100) {
+    console.log("Email is too long.");
+    throw new AppError(400, "Email must be at most 100 characters long.");
+  }
 
-//     const validPassword = await bcrypt.compare(password, user.password);
-//     if (!validPassword) {
-//       res.status(401).json({ error: 'Invalid credentials.' });
-//       return;
-//     }
+  console.log("Validating password length...");
+  if (password.length > 18 || password.length < 6) {
+    console.log("Invalid password length.");
+    throw new AppError(400, "Password must be between 6 and 18 characters long.");
+  }
 
-//     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
-//       expiresIn: '1h',
-//     });
-//     res.json({ token });
-//   } catch (error) {
-//     res.status(500).json({ error: 'Error logging in.' });
-//     return
-//   }
-// };
-
-// export const home: RequestHandler = async (req: Request, res: Response) => {
-//   res.status(200).json({ message: 'Welcome to the protected home page!', user: req.body.userId });
-//   return;
-// };
+  try {
+    const { token } = await loginUser(email, password);
+    console.log("User logged in successfully.. returning JWT token and user info.");
+    res.status(200).json({ token, user: { email, password } });
+  } catch (error: any) {
+    console.error("Error during login: ", error);
+    next(error); // Pass the error to the error handling middleware
+  }
+};
