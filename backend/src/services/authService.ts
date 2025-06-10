@@ -45,7 +45,7 @@ export const loginUser = async (email: string, password: string) => {
     const user = await userRepository.findOneBy({ email });
     if (!user) {
         console.log("No user found with this email:", email);
-        throw new AppError(400, "User with the email address was not found.");
+        throw new AppError(401, "Invalid email or password.");
     }
 
     console.log("Validating password...");
@@ -55,14 +55,14 @@ export const loginUser = async (email: string, password: string) => {
         throw new AppError(401, "Invalid email or password.");
     }
 
-    const userInfo = {
-    id: user.id,
+    const payload = {
+    userId: user.id,
     email: user.email
     };
 
-    console.log("User logged in successfully.. returning JWT token and user info.");
-    const token = sign({ user: userInfo }, process.env.JWT_SECRET as string, {
+    console.log("Login successful.. creating JWT token and user info..");
+    const token = sign(payload, process.env.JWT_SECRET as string, {
         expiresIn: '1h' // Adjust the expiration time as needed
     });
-    return { token };
+    return { token, user: { id: user.id, email: user.email } };
 }

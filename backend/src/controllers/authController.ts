@@ -13,9 +13,9 @@ export const register: RequestHandler = async (req: Request, res: Response, next
   }
 
   console.log("Validating password length...");
-  if (password.length > 18 || password.length < 6) {
+  if (password.length > 32 || password.length < 6) {
     console.log("Invalid password length.");
-    throw new AppError(400, "Password must be between 6 and 18 characters long.");
+    throw new AppError(400, "Password must be between 6 and 32 characters long.");
   }
 
   console.log("Validating email format and length...");
@@ -52,25 +52,25 @@ export const login: RequestHandler = async (req: Request, res: Response, next) =
   console.log("Validating email format and length...");
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    console.log("Invalid email format.");
-    throw new AppError(400, "Invalid email format.");
+    console.log("Invalid email format. Returning generic error message.");
+    throw new AppError(400, "Invalid email or password.");
   }
 
   if (email.length > 100) {
-    console.log("Email is too long.");
-    throw new AppError(400, "Email must be at most 100 characters long.");
+    console.log("Email is too long. Returning generic error message.");
+    throw new AppError(400, "Invalid email or password.");
   }
 
   console.log("Validating password length...");
-  if (password.length > 18 || password.length < 6) {
-    console.log("Invalid password length.");
-    throw new AppError(400, "Password must be between 6 and 18 characters long.");
+  if (password.length > 32 || password.length < 6) {
+    console.log("Invalid password length. Returning generic error message.");
+    throw new AppError(400, "Invalid email or password.");
   }
 
   try {
-    const { token } = await loginUser(email, password);
-    console.log("User logged in successfully.. returning JWT token and user info.");
-    res.status(200).json({ token, user: { email, password } });
+    const { token, user } = await loginUser(email, password);
+    console.log("Returning JWT token and user info..");
+    res.status(200).json({ token, user });
   } catch (error: any) {
     console.error("Error during login: ", error);
     next(error); // Pass the error to the error handling middleware
