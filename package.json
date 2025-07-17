@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "@types/express": "^5.0.2"
+  },
+  "dependencies": {
+    "winston": "^3.17.0"
   }
 }
